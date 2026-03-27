@@ -134,6 +134,7 @@ const WatchlistTracker = ({ dramaId, totalEpisodes, onAuthRequired }: WatchlistT
                 onClick={async () => {
                   const newRating = entry.rating === star ? null : star;
                   const result = await upsertWatchlistEntry(dramaId, { rating: newRating });
+                  invalidateAggregateCache();
                   setEntry(result);
                 }}
                 className="relative p-0.5 transition-transform hover:scale-110"
