@@ -1,9 +1,23 @@
 import { useSearchParams } from "react-router-dom";
-import { useState, useMemo } from "react";
-import { Search } from "lucide-react";
+import { useState } from "react";
+import { Search, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import DramaCard from "@/components/DramaCard";
-import { dramas, genres, searchDramas } from "@/data/dramas";
+import { discoverKDramas, searchKDramas, fetchTopRatedKDramas } from "@/lib/tmdb";
+
+const GENRE_OPTIONS = [
+  { id: "", label: "All" },
+  { id: "18", label: "Drama" },
+  { id: "35", label: "Comedy" },
+  { id: "10749", label: "Romance" },
+  { id: "10759", label: "Action" },
+  { id: "10765", label: "Sci-Fi & Fantasy" },
+  { id: "9648", label: "Mystery" },
+  { id: "80", label: "Crime" },
+  { id: "10768", label: "War & Politics" },
+  { id: "10751", label: "Family" },
+];
 
 const Browse = () => {
   const [searchParams] = useSearchParams();
@@ -13,24 +27,42 @@ const Browse = () => {
 
   const [query, setQuery] = useState(initialQuery);
   const [selectedGenre, setSelectedGenre] = useState(genreFilter);
+  const [page, setPage] = useState(1);
 
-  const filteredDramas = useMemo(() => {
-    let results = dramas;
+  // Search mode
+  const { data: searchResults, isLoading: searchLoading } = useQuery({
+    queryKey: ["tmdb-search", query],
+    queryFn: () => searchKDramas(query),
+    enabled: query.trim().length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
 
-    if (query.trim()) {
-      results = searchDramas(query);
-    }
+  // Top rated mode
+  const { data: topRated, isLoading: topRatedLoading } = useQuery({
+    queryKey: ["tmdb-top-rated-browse"],
+    queryFn: fetchTopRatedKDramas,
+    enabled: filter === "top-rated" && !query.trim(),
+    staleTime: 1000 * 60 * 10,
+  });
 
-    if (selectedGenre) {
-      results = results.filter(d => d.genres.includes(selectedGenre));
-    }
+  // Discover mode (default)
+  const { data: discoverData, isLoading: discoverLoading } = useQuery({
+    queryKey: ["tmdb-discover", page, selectedGenre, filter],
+    queryFn: () => discoverKDramas(page, selectedGenre || undefined, filter === "trending" ? "popularity.desc" : undefined),
+    enabled: !query.trim() && filter !== "top-rated",
+    staleTime: 1000 * 60 * 5,
+  });
 
-    if (filter === "top-rated") {
-      results = [...results].sort((a, b) => b.rating - a.rating);
-    }
+  const isLoading = searchLoading || topRatedLoading || discoverLoading;
 
-    return results;
-  }, [query, selectedGenre, filter]);
+  let dramas = discoverData?.dramas || [];
+  const totalPages = discoverData?.totalPages || 1;
+
+  if (query.trim() && searchResults) {
+    dramas = searchResults;
+  } else if (filter === "top-rated" && topRated) {
+    dramas = topRated;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,7 +72,7 @@ const Browse = () => {
           {filter === "top-rated" ? "Top Rated" : filter === "trending" ? "Trending" : "Browse"} K-Dramas
         </h1>
         <p className="text-muted-foreground mb-8">
-          {filteredDramas.length} drama{filteredDramas.length !== 1 ? "s" : ""} found
+          {dramas.length} drama{dramas.length !== 1 ? "s" : ""} found
         </p>
 
         <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -48,45 +80,70 @@ const Browse = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by title, actor, genre..."
+              onChange={(e) => { setQuery(e.target.value); setPage(1); }}
+              placeholder="Search by title..."
               className="w-full bg-card border border-border text-foreground pl-10 pr-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground"
             />
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedGenre("")}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                !selectedGenre ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              }`}
-            >
-              All
-            </button>
-            {genres.map(genre => (
+            {GENRE_OPTIONS.map(g => (
               <button
-                key={genre}
-                onClick={() => setSelectedGenre(genre === selectedGenre ? "" : genre)}
+                key={g.id}
+                onClick={() => { setSelectedGenre(g.id === selectedGenre ? "" : g.id); setPage(1); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  selectedGenre === genre ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  selectedGenre === g.id || (!selectedGenre && !g.id)
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                 }`}
               >
-                {genre}
+                {g.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {filteredDramas.map((drama, i) => (
-            <DramaCard key={drama.id} drama={drama} index={i} />
-          ))}
-        </div>
-
-        {filteredDramas.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground text-lg">No dramas found. Try a different search.</p>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {dramas.map((drama, i) => (
+                <DramaCard key={drama.id} drama={drama} index={i} />
+              ))}
+            </div>
+
+            {dramas.length === 0 && (
+              <div className="text-center py-20">
+                <p className="text-muted-foreground text-lg">No dramas found. Try a different search.</p>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {!query.trim() && filter !== "top-rated" && totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-10">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-40 hover:bg-secondary/80 transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-muted-foreground px-3">
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-40 hover:bg-secondary/80 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
