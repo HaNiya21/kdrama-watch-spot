@@ -1,19 +1,47 @@
 import { useParams, Link } from "react-router-dom";
-import { Star, Calendar, Tv, PlayCircle, ArrowLeft, Users } from "lucide-react";
+import { Star, Calendar, Tv, PlayCircle, ArrowLeft, Users, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import DramaCard from "@/components/DramaCard";
 import WatchlistTracker from "@/components/WatchlistTracker";
 import AuthModal from "@/components/AuthModal";
-import { getDramaById, dramas } from "@/data/dramas";
+import { fetchKDramaDetails, fetchTrendingKDramas } from "@/lib/tmdb";
 import { useAggregateRating } from "@/hooks/useAggregateRatings";
 
 const DramaDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const drama = getDramaById(id || "");
   const [authOpen, setAuthOpen] = useState(false);
   const agg = useAggregateRating(id || "");
+
+  const { data: drama, isLoading } = useQuery({
+    queryKey: ["tmdb-detail", id],
+    queryFn: () => fetchKDramaDetails(id!),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 15,
+  });
+
+  // Fetch similar dramas based on similarIds from the detail response
+  const { data: similarDramas = [] } = useQuery({
+    queryKey: ["tmdb-similar", drama?.similarIds],
+    queryFn: async () => {
+      if (!drama?.similarIds?.length) return [];
+      const promises = drama.similarIds.slice(0, 6).map(sid => fetchKDramaDetails(sid).catch(() => null));
+      const results = await Promise.all(promises);
+      return results.filter(Boolean) as NonNullable<typeof drama>[];
+    },
+    enabled: !!drama && drama.similarIds.length > 0,
+    staleTime: 1000 * 60 * 15,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!drama) {
     return (
@@ -25,10 +53,6 @@ const DramaDetail = () => {
       </div>
     );
   }
-
-  const similarDramas = drama.similarIds
-    .map(sid => dramas.find(d => d.id === sid))
-    .filter(Boolean) as typeof dramas;
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +76,7 @@ const DramaDetail = () => {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex-1">
             <h1 className="text-4xl md:text-5xl font-display text-foreground mb-1">{drama.title}</h1>
-            <p className="text-lg text-muted-foreground mb-4">{drama.titleKorean}</p>
+            {drama.titleKorean && <p className="text-lg text-muted-foreground mb-4">{drama.titleKorean}</p>}
 
             <div className="flex flex-wrap items-center gap-4 mb-6">
               <div className="flex items-center gap-1.5">
@@ -67,21 +91,26 @@ const DramaDetail = () => {
                   </span>
                 </div>
               )}
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Calendar className="w-4 h-4" /><span className="text-sm">{drama.year}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Tv className="w-4 h-4" /><span className="text-sm">{drama.episodes} Episodes</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <PlayCircle className="w-4 h-4" /><span className="text-sm">{drama.network}</span>
-              </div>
+              {drama.year > 0 && (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Calendar className="w-4 h-4" /><span className="text-sm">{drama.year}</span>
+                </div>
+              )}
+              {drama.episodes > 0 && (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Tv className="w-4 h-4" /><span className="text-sm">{drama.episodes} Episodes</span>
+                </div>
+              )}
+              {drama.network && (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <PlayCircle className="w-4 h-4" /><span className="text-sm">{drama.network}</span>
+                </div>
+              )}
               <span className={`text-xs font-medium px-3 py-1 rounded-full ${drama.airingStatus === "ongoing" ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}`}>
                 {drama.airingStatus === "ongoing" ? "Currently Airing" : "Completed"}
               </span>
             </div>
 
-            {/* Watchlist Tracker */}
             <div className="mb-6">
               <WatchlistTracker dramaId={drama.id} totalEpisodes={drama.episodes} onAuthRequired={() => setAuthOpen(true)} />
             </div>
@@ -95,32 +124,49 @@ const DramaDetail = () => {
             <h2 className="text-xl font-display text-foreground mb-2">Synopsis</h2>
             <p className="text-foreground/80 leading-relaxed mb-8">{drama.synopsis}</p>
 
-            <h2 className="text-xl font-display text-foreground mb-3">Tags & Tropes</h2>
-            <div className="flex flex-wrap gap-2 mb-8">
-              {drama.tags.map(tag => (
-                <span key={tag} className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs">#{tag}</span>
-              ))}
-            </div>
-
-            <h2 className="text-xl font-display text-foreground mb-3">Cast</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-              {drama.cast.map(member => (
-                <div key={member.name} className="bg-card rounded-lg p-3 border border-border">
-                  <p className="text-sm font-medium text-foreground">{member.name}</p>
-                  <p className="text-xs text-muted-foreground">as {member.role}</p>
+            {drama.tags.length > 0 && (
+              <>
+                <h2 className="text-xl font-display text-foreground mb-3">Tags & Keywords</h2>
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {drama.tags.map(tag => (
+                    <span key={tag} className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs">#{tag}</span>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
 
-            <h2 className="text-xl font-display text-foreground mb-3">Episodes</h2>
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mb-8">
-              {Array.from({ length: drama.episodes }, (_, i) => (
-                <div key={i} className="bg-card border border-border rounded-lg p-2 text-center hover:bg-secondary transition-colors cursor-pointer">
-                  <span className="text-xs text-muted-foreground">Ep</span>
-                  <p className="text-sm font-medium text-foreground">{i + 1}</p>
+            {drama.cast.length > 0 && (
+              <>
+                <h2 className="text-xl font-display text-foreground mb-3">Cast</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                  {drama.cast.map(member => (
+                    <div key={member.name} className="bg-card rounded-lg p-3 border border-border flex items-center gap-3">
+                      {member.image && (
+                        <img src={member.image} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{member.name}</p>
+                        <p className="text-xs text-muted-foreground">as {member.role}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
+
+            {drama.episodes > 0 && (
+              <>
+                <h2 className="text-xl font-display text-foreground mb-3">Episodes</h2>
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mb-8">
+                  {Array.from({ length: drama.episodes }, (_, i) => (
+                    <div key={i} className="bg-card border border-border rounded-lg p-2 text-center hover:bg-secondary transition-colors cursor-pointer">
+                      <span className="text-xs text-muted-foreground">Ep</span>
+                      <p className="text-sm font-medium text-foreground">{i + 1}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </motion.div>
         </div>
 

@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import DramaRow from "@/components/DramaRow";
 import DramaCard from "@/components/DramaCard";
 import GenreChips from "@/components/GenreChips";
-import { dramas } from "@/data/dramas";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserWatchlist, type WatchlistEntry } from "@/lib/watchlist";
 import { getRecommendations } from "@/lib/recommendations";
+import { fetchTrendingKDramas, fetchTopRatedKDramas, fetchKDramasByGenre } from "@/lib/tmdb";
 
 const Index = () => {
   const { user } = useAuth();
@@ -19,9 +20,24 @@ const Index = () => {
     if (user) getUserWatchlist().then(setEntries);
   }, [user]);
 
-  const trending = dramas.slice(0, 6);
-  const topRated = [...dramas].sort((a, b) => b.rating - a.rating).slice(0, 6);
-  const romance = dramas.filter(d => d.genres.includes("Romance")).slice(0, 6);
+  const { data: trending = [], isLoading: trendingLoading } = useQuery({
+    queryKey: ["tmdb-trending"],
+    queryFn: fetchTrendingKDramas,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const { data: topRated = [], isLoading: topRatedLoading } = useQuery({
+    queryKey: ["tmdb-top-rated"],
+    queryFn: fetchTopRatedKDramas,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const { data: romance = [], isLoading: romanceLoading } = useQuery({
+    queryKey: ["tmdb-romance"],
+    queryFn: () => fetchKDramasByGenre("10749"),
+    staleTime: 1000 * 60 * 10,
+  });
+
   const recommendations = getRecommendations(entries).slice(0, 6);
 
   return (
@@ -29,7 +45,6 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <main className="container mx-auto px-4 pb-16">
-        {/* Personalized recommendations if logged in */}
         {user && recommendations.length > 0 && (
           <section className="py-8">
             <div className="flex items-center justify-between mb-5">
@@ -54,10 +69,23 @@ const Index = () => {
           </section>
         )}
 
-        <DramaRow title="🔥 Trending Now" dramas={trending} linkTo="/browse?filter=trending" />
-        <DramaRow title="⭐ Top Rated" dramas={topRated} linkTo="/browse?filter=top-rated" />
+        {trendingLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        ) : (
+          <DramaRow title="🔥 Trending Now" dramas={trending.slice(0, 6)} linkTo="/browse?filter=trending" />
+        )}
+
+        {topRatedLoading ? null : (
+          <DramaRow title="⭐ Top Rated" dramas={topRated.slice(0, 6)} linkTo="/browse?filter=top-rated" />
+        )}
+
         <GenreChips />
-        <DramaRow title="💕 Romance Picks" dramas={romance} linkTo="/browse?genre=Romance" />
+
+        {romanceLoading ? null : (
+          <DramaRow title="💕 Romance Picks" dramas={romance.slice(0, 6)} linkTo="/browse?genre=10749" />
+        )}
       </main>
 
       <footer className="border-t border-border py-8">
