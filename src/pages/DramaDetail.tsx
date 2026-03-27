@@ -13,6 +13,7 @@ const DramaDetail = () => {
   const { id } = useParams<{ id: string }>();
   const drama = getDramaById(id || "");
   const [authOpen, setAuthOpen] = useState(false);
+  const agg = useAggregateRating(id || "");
 
   if (!drama) {
     return (
