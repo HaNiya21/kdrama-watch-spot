@@ -1,16 +1,33 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import DramaRow from "@/components/DramaRow";
+import GenreChips from "@/components/GenreChips";
+import { dramas } from "@/data/dramas";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const trending = dramas.slice(0, 6);
+  const topRated = [...dramas].sort((a, b) => b.rating - a.rating).slice(0, 6);
+  const romance = dramas.filter(d => d.genres.includes("Romance")).slice(0, 6);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <HeroSection />
+      <main className="container mx-auto px-4 pb-16">
+        <DramaRow title="🔥 Trending Now" dramas={trending} linkTo="/browse?filter=trending" />
+        <DramaRow title="⭐ Top Rated" dramas={topRated} linkTo="/browse?filter=top-rated" />
+        <GenreChips />
+        <DramaRow title="💕 Romance Picks" dramas={romance} linkTo="/browse?genre=Romance" />
+      </main>
+
+      <footer className="border-t border-border py-8">
+        <div className="container mx-auto px-4 text-center">
+          <span className="text-2xl font-display text-gradient">KDramaDex</span>
+          <p className="text-sm text-muted-foreground mt-2">Your K-Drama Universe · Discover · Track · Enjoy</p>
+        </div>
+      </footer>
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
