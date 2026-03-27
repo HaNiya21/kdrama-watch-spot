@@ -21,6 +21,10 @@ import backdropItaewon from "@/assets/backdrops/itaewon-class.jpg";
 import backdropVincenzo from "@/assets/backdrops/vincenzo.jpg";
 import backdropStartUp from "@/assets/backdrops/start-up.jpg";
 import backdropReply from "@/assets/backdrops/reply-1988.jpg";
+import backdropSquidGame from "@/assets/backdrops/squid-game.jpg";
+import backdropAOUAD from "@/assets/backdrops/all-of-us-are-dead.jpg";
+import backdropKingdom from "@/assets/backdrops/kingdom.jpg";
+import backdropAttorneyWoo from "@/assets/backdrops/extraordinary-attorney-woo.jpg";
 
 export interface Drama {
   id: string;
