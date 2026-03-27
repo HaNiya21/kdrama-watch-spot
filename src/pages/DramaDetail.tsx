@@ -1,13 +1,17 @@
 import { useParams, Link } from "react-router-dom";
 import { Star, Calendar, Tv, PlayCircle, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import DramaCard from "@/components/DramaCard";
+import WatchlistTracker from "@/components/WatchlistTracker";
+import AuthModal from "@/components/AuthModal";
 import { getDramaById, dramas } from "@/data/dramas";
 
 const DramaDetail = () => {
   const { id } = useParams<{ id: string }>();
   const drama = getDramaById(id || "");
+  const [authOpen, setAuthOpen] = useState(false);
 
   if (!drama) {
     return (
@@ -28,7 +32,6 @@ const DramaDetail = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Backdrop */}
       <div className="relative h-[50vh] md:h-[60vh]">
         <img src={drama.backdrop} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
@@ -41,26 +44,11 @@ const DramaDetail = () => {
         </Link>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Poster */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="w-48 md:w-64 flex-shrink-0"
-          >
-            <img
-              src={drama.poster}
-              alt={drama.title}
-              className="w-full rounded-xl shadow-[var(--shadow-card)]"
-            />
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="w-48 md:w-64 flex-shrink-0">
+            <img src={drama.poster} alt={drama.title} className="w-full rounded-xl shadow-[var(--shadow-card)]" />
           </motion.div>
 
-          {/* Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="flex-1"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex-1">
             <h1 className="text-4xl md:text-5xl font-display text-foreground mb-1">{drama.title}</h1>
             <p className="text-lg text-muted-foreground mb-4">{drama.titleKorean}</p>
 
@@ -70,50 +58,40 @@ const DramaDetail = () => {
                 <span className="text-lg font-bold text-rating">{drama.rating}</span>
               </div>
               <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span className="text-sm">{drama.year}</span>
+                <Calendar className="w-4 h-4" /><span className="text-sm">{drama.year}</span>
               </div>
               <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Tv className="w-4 h-4" />
-                <span className="text-sm">{drama.episodes} Episodes</span>
+                <Tv className="w-4 h-4" /><span className="text-sm">{drama.episodes} Episodes</span>
               </div>
               <div className="flex items-center gap-1.5 text-muted-foreground">
-                <PlayCircle className="w-4 h-4" />
-                <span className="text-sm">{drama.network}</span>
+                <PlayCircle className="w-4 h-4" /><span className="text-sm">{drama.network}</span>
               </div>
-              <span className={`text-xs font-medium px-3 py-1 rounded-full ${
-                drama.airingStatus === "ongoing" ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"
-              }`}>
+              <span className={`text-xs font-medium px-3 py-1 rounded-full ${drama.airingStatus === "ongoing" ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}`}>
                 {drama.airingStatus === "ongoing" ? "Currently Airing" : "Completed"}
               </span>
             </div>
 
+            {/* Watchlist Tracker */}
+            <div className="mb-6">
+              <WatchlistTracker dramaId={drama.id} totalEpisodes={drama.episodes} onAuthRequired={() => setAuthOpen(true)} />
+            </div>
+
             <div className="flex flex-wrap gap-2 mb-6">
               {drama.genres.map(g => (
-                <Link
-                  key={g}
-                  to={`/browse?genre=${encodeURIComponent(g)}`}
-                  className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
-                >
-                  {g}
-                </Link>
+                <Link key={g} to={`/browse?genre=${encodeURIComponent(g)}`} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors">{g}</Link>
               ))}
             </div>
 
             <h2 className="text-xl font-display text-foreground mb-2">Synopsis</h2>
             <p className="text-foreground/80 leading-relaxed mb-8">{drama.synopsis}</p>
 
-            {/* Tags */}
             <h2 className="text-xl font-display text-foreground mb-3">Tags & Tropes</h2>
             <div className="flex flex-wrap gap-2 mb-8">
               {drama.tags.map(tag => (
-                <span key={tag} className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs">
-                  #{tag}
-                </span>
+                <span key={tag} className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs">#{tag}</span>
               ))}
             </div>
 
-            {/* Cast */}
             <h2 className="text-xl font-display text-foreground mb-3">Cast</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
               {drama.cast.map(member => (
@@ -124,14 +102,10 @@ const DramaDetail = () => {
               ))}
             </div>
 
-            {/* Episodes */}
             <h2 className="text-xl font-display text-foreground mb-3">Episodes</h2>
             <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mb-8">
               {Array.from({ length: drama.episodes }, (_, i) => (
-                <div
-                  key={i}
-                  className="bg-card border border-border rounded-lg p-2 text-center hover:bg-secondary transition-colors cursor-pointer"
-                >
+                <div key={i} className="bg-card border border-border rounded-lg p-2 text-center hover:bg-secondary transition-colors cursor-pointer">
                   <span className="text-xs text-muted-foreground">Ep</span>
                   <p className="text-sm font-medium text-foreground">{i + 1}</p>
                 </div>
@@ -140,18 +114,17 @@ const DramaDetail = () => {
           </motion.div>
         </div>
 
-        {/* Similar */}
         {similarDramas.length > 0 && (
           <section className="mt-16">
             <h2 className="text-2xl font-display text-foreground mb-5">Similar Dramas</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {similarDramas.map((d, i) => (
-                <DramaCard key={d.id} drama={d} index={i} />
-              ))}
+              {similarDramas.map((d, i) => <DramaCard key={d.id} drama={d} index={i} />)}
             </div>
           </section>
         )}
       </main>
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 };
