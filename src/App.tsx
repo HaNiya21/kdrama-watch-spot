@@ -8,6 +8,7 @@ import Index from "./pages/Index.tsx";
 import Browse from "./pages/Browse.tsx";
 import DramaDetail from "./pages/DramaDetail.tsx";
 import Watchlist from "./pages/Watchlist.tsx";
+import Recommendations from "./pages/Recommendations.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
