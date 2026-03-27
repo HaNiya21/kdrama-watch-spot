@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookmarkPlus, ChevronDown, Minus, Plus, Star, Trash2, MessageSquare, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { invalidateAggregateCache } from "@/hooks/useAggregateRatings";
 import {
   type WatchStatus,
   type WatchlistEntry,
