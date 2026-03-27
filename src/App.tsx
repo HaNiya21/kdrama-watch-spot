@@ -8,6 +8,7 @@ import Index from "./pages/Index.tsx";
 import Browse from "./pages/Browse.tsx";
 import DramaDetail from "./pages/DramaDetail.tsx";
 import Watchlist from "./pages/Watchlist.tsx";
+import Recommendations from "./pages/Recommendations.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/browse" element={<Browse />} />
             <Route path="/drama/:id" element={<DramaDetail />} />
             <Route path="/watchlist" element={<Watchlist />} />
+            <Route path="/recommendations" element={<Recommendations />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
