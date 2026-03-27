@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { Star, Calendar, Tv, PlayCircle, ArrowLeft } from "lucide-react";
+import { Star, Calendar, Tv, PlayCircle, ArrowLeft, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
