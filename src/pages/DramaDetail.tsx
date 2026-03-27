@@ -59,6 +59,14 @@ const DramaDetail = () => {
                 <Star className="w-5 h-5 fill-rating text-rating" />
                 <span className="text-lg font-bold text-rating">{drama.rating}</span>
               </div>
+              {agg && agg.rating_count > 0 && (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Users className="w-4 h-4" />
+                  <span className="text-sm">
+                    <span className="font-semibold text-foreground">{agg.avg_rating}</span>/5 ({agg.rating_count} {agg.rating_count === 1 ? "user" : "users"})
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-1.5 text-muted-foreground">
                 <Calendar className="w-4 h-4" /><span className="text-sm">{drama.year}</span>
               </div>
