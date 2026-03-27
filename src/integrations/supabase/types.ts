@@ -58,7 +58,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_drama_aggregate_ratings: {
+        Args: never
+        Returns: {
+          avg_rating: number
+          drama_id: string
+          rating_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
