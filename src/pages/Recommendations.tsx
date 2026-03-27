@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Compass } from "lucide-react";
+import { Sparkles, Compass, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import DramaCard from "@/components/DramaCard";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserWatchlist, type WatchlistEntry } from "@/lib/watchlist";
+import { getUserWatchlist } from "@/lib/watchlist";
 import {
   getRecommendations,
   getBecauseYouWatched,
@@ -13,30 +13,44 @@ import {
   moodLabels,
   type Mood,
 } from "@/lib/recommendations";
+import { useState } from "react";
 
 const moods: Mood[] = ["romantic", "thrilling", "funny", "emotional", "action-packed"];
 
 const Recommendations = () => {
   const { user } = useAuth();
-  const [entries, setEntries] = useState<WatchlistEntry[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      getUserWatchlist().then((data) => {
-        setEntries(data);
-        setLoading(false);
-      });
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
+  const { data: entries = [], isLoading: entriesLoading } = useQuery({
+    queryKey: ["watchlist"],
+    queryFn: getUserWatchlist,
+    enabled: !!user,
+  });
 
   const watchedIds = new Set(entries.map(e => e.drama_id));
-  const personalized = getRecommendations(entries);
-  const becauseYouWatched = getBecauseYouWatched(entries);
-  const moodDramas = selectedMood ? getDramasByMood(selectedMood, watchedIds) : [];
+
+  const { data: personalized = [], isLoading: recLoading } = useQuery({
+    queryKey: ["recommendations", entries.map(e => e.drama_id).sort().join(",")],
+    queryFn: () => getRecommendations(entries),
+    enabled: !!user && entries.length > 0,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const { data: becauseYouWatched = [] } = useQuery({
+    queryKey: ["because-you-watched", entries.map(e => e.drama_id).sort().join(",")],
+    queryFn: () => getBecauseYouWatched(entries),
+    enabled: !!user && entries.length > 0,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const { data: moodDramas = [], isLoading: moodLoading } = useQuery({
+    queryKey: ["mood-dramas", selectedMood],
+    queryFn: () => getDramasByMood(selectedMood!, watchedIds),
+    enabled: !!selectedMood,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const loading = entriesLoading || recLoading;
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,7 +84,12 @@ const Recommendations = () => {
               </button>
             ))}
           </div>
-          {selectedMood && moodDramas.length > 0 && (
+          {selectedMood && moodLoading && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          )}
+          {selectedMood && !moodLoading && moodDramas.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -105,7 +124,6 @@ const Recommendations = () => {
               </section>
             )}
 
-            {/* Because you watched */}
             {becauseYouWatched.map(({ source, recommendations }) => (
               <section key={source.id} className="mb-12">
                 <h2 className="text-2xl font-display text-foreground mb-1">
@@ -125,8 +143,13 @@ const Recommendations = () => {
           </>
         )}
 
-        {/* Not logged in or empty watchlist */}
-        {(!user || entries.length === 0) && !loading && (
+        {user && loading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        )}
+
+        {(!user || (entries.length === 0 && !entriesLoading)) && (
           <section className="text-center py-16 bg-card rounded-xl border border-border">
             <Compass className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-display text-foreground mb-2">Get Personalized Picks</h3>

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Sparkles, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -8,17 +7,25 @@ import DramaRow from "@/components/DramaRow";
 import DramaCard from "@/components/DramaCard";
 import GenreChips from "@/components/GenreChips";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserWatchlist, type WatchlistEntry } from "@/lib/watchlist";
+import { getUserWatchlist } from "@/lib/watchlist";
 import { getRecommendations } from "@/lib/recommendations";
 import { fetchTrendingKDramas, fetchTopRatedKDramas, fetchKDramasByGenre } from "@/lib/tmdb";
 
 const Index = () => {
   const { user } = useAuth();
-  const [entries, setEntries] = useState<WatchlistEntry[]>([]);
 
-  useEffect(() => {
-    if (user) getUserWatchlist().then(setEntries);
-  }, [user]);
+  const { data: entries = [] } = useQuery({
+    queryKey: ["watchlist"],
+    queryFn: getUserWatchlist,
+    enabled: !!user,
+  });
+
+  const { data: recommendations = [] } = useQuery({
+    queryKey: ["recommendations", entries.map(e => e.drama_id).sort().join(",")],
+    queryFn: () => getRecommendations(entries),
+    enabled: !!user && entries.length > 0,
+    staleTime: 1000 * 60 * 10,
+  });
 
   const { data: trending = [], isLoading: trendingLoading } = useQuery({
     queryKey: ["tmdb-trending"],
@@ -26,19 +33,17 @@ const Index = () => {
     staleTime: 1000 * 60 * 10,
   });
 
-  const { data: topRated = [], isLoading: topRatedLoading } = useQuery({
+  const { data: topRated = [] } = useQuery({
     queryKey: ["tmdb-top-rated"],
     queryFn: fetchTopRatedKDramas,
     staleTime: 1000 * 60 * 10,
   });
 
-  const { data: romance = [], isLoading: romanceLoading } = useQuery({
+  const { data: romance = [] } = useQuery({
     queryKey: ["tmdb-romance"],
     queryFn: () => fetchKDramasByGenre("10749"),
     staleTime: 1000 * 60 * 10,
   });
-
-  const recommendations = getRecommendations(entries).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,7 +62,7 @@ const Index = () => {
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {recommendations.map(({ drama, reasons }, i) => (
+              {recommendations.slice(0, 6).map(({ drama, reasons }, i) => (
                 <div key={drama.id}>
                   <DramaCard drama={drama} index={i} />
                   {reasons[0] && (
@@ -77,15 +82,9 @@ const Index = () => {
           <DramaRow title="🔥 Trending Now" dramas={trending.slice(0, 6)} linkTo="/browse?filter=trending" />
         )}
 
-        {topRatedLoading ? null : (
-          <DramaRow title="⭐ Top Rated" dramas={topRated.slice(0, 6)} linkTo="/browse?filter=top-rated" />
-        )}
-
+        <DramaRow title="⭐ Top Rated" dramas={topRated.slice(0, 6)} linkTo="/browse?filter=top-rated" />
         <GenreChips />
-
-        {romanceLoading ? null : (
-          <DramaRow title="💕 Romance Picks" dramas={romance.slice(0, 6)} linkTo="/browse?genre=10749" />
-        )}
+        <DramaRow title="💕 Romance Picks" dramas={romance.slice(0, 6)} linkTo="/browse?genre=10749" />
       </main>
 
       <footer className="border-t border-border py-8">
