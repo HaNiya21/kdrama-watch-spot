@@ -120,6 +120,37 @@ const WatchlistTracker = ({ dramaId, totalEpisodes, onAuthRequired }: WatchlistT
         </AnimatePresence>
       </div>
 
+      {/* Star Rating */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">Your Rating</span>
+        <div className="flex items-center gap-0.5">
+          {[1, 2, 3, 4, 5].map((star) => {
+            const filled = entry.rating && star <= entry.rating;
+            const halfFilled = entry.rating && star - 0.5 === entry.rating;
+            return (
+              <button
+                key={star}
+                onClick={async () => {
+                  const newRating = entry.rating === star ? null : star;
+                  const result = await upsertWatchlistEntry(dramaId, { rating: newRating });
+                  setEntry(result);
+                }}
+                className="relative p-0.5 transition-transform hover:scale-110"
+              >
+                <Star
+                  className={`w-5 h-5 transition-colors ${
+                    filled ? "fill-rating text-rating" : "text-muted-foreground/40"
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </div>
+        {entry.rating && (
+          <span className="text-xs text-rating font-medium">{entry.rating}/5</span>
+        )}
+      </div>
+
       {/* Episode tracker */}
       {(entry.status === "watching" || entry.status === "paused") && (
         <div className="flex items-center gap-3">
