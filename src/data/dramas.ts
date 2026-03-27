@@ -7,6 +7,10 @@ import posterItaewon from "@/assets/posters/itaewon-class.jpg";
 import posterVincenzo from "@/assets/posters/vincenzo.jpg";
 import posterStartUp from "@/assets/posters/start-up.jpg";
 import posterReply from "@/assets/posters/reply-1988.jpg";
+import posterSquidGame from "@/assets/posters/squid-game.jpg";
+import posterAOUAD from "@/assets/posters/all-of-us-are-dead.jpg";
+import posterKingdom from "@/assets/posters/kingdom.jpg";
+import posterAttorneyWoo from "@/assets/posters/extraordinary-attorney-woo.jpg";
 
 // Backdrop imports
 import backdropCLOY from "@/assets/backdrops/crash-landing-on-you.jpg";
