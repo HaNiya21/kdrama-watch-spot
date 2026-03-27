@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookmarkPlus, ChevronDown, Minus, Plus, Star, Trash2 } from "lucide-react";
+import { BookmarkPlus, ChevronDown, Minus, Plus, Star, Trash2, MessageSquare, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { invalidateAggregateCache } from "@/hooks/useAggregateRatings";
 import {
   type WatchStatus,
   type WatchlistEntry,
@@ -133,6 +134,7 @@ const WatchlistTracker = ({ dramaId, totalEpisodes, onAuthRequired }: WatchlistT
                 onClick={async () => {
                   const newRating = entry.rating === star ? null : star;
                   const result = await upsertWatchlistEntry(dramaId, { rating: newRating });
+                  invalidateAggregateCache();
                   setEntry(result);
                 }}
                 className="relative p-0.5 transition-transform hover:scale-110"
@@ -181,6 +183,71 @@ const WatchlistTracker = ({ dramaId, totalEpisodes, onAuthRequired }: WatchlistT
           </div>
         </div>
       )}
+
+      {/* Notes / Review */}
+      <NotesSection entry={entry} dramaId={dramaId} onUpdate={setEntry} />
+    </div>
+  );
+};
+
+const NotesSection = ({ entry, dramaId, onUpdate }: { entry: WatchlistEntry; dramaId: string; onUpdate: (e: WatchlistEntry) => void }) => {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState(entry.notes || "");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => { setText(entry.notes || ""); }, [entry.notes]);
+
+  const save = useCallback(async () => {
+    setSaving(true);
+    const result = await upsertWatchlistEntry(dramaId, { notes: text || null });
+    onUpdate(result);
+    setSaving(false);
+  }, [dramaId, text, onUpdate]);
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <MessageSquare className="w-4 h-4" />
+        {entry.notes ? "Edit Note" : "Add Note"}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2 space-y-2">
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Write your thoughts, review, or notes about this drama..."
+                className="w-full bg-card border border-border text-foreground rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground resize-none min-h-[80px]"
+              />
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={save}
+                  disabled={saving}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  {saving ? "Saving..." : "Save Note"}
+                </button>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
+import { Star, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Drama } from "@/data/dramas";
+import { useAggregateRatings } from "@/hooks/useAggregateRatings";
 
 interface DramaCardProps {
   drama: Drama;
@@ -9,6 +10,9 @@ interface DramaCardProps {
 }
 
 const DramaCard = ({ drama, index = 0 }: DramaCardProps) => {
+  const ratings = useAggregateRatings();
+  const agg = ratings[drama.id];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -20,6 +24,7 @@ const DramaCard = ({ drama, index = 0 }: DramaCardProps) => {
           <img
             src={drama.poster}
             alt={drama.title}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -35,6 +40,14 @@ const DramaCard = ({ drama, index = 0 }: DramaCardProps) => {
               {drama.airingStatus === "ongoing" ? "Airing" : drama.year}
             </span>
           </div>
+          {agg && agg.rating_count > 0 && (
+            <div className="absolute top-2 left-2">
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-background/80 text-foreground backdrop-blur-sm">
+                <Users className="w-2.5 h-2.5" />
+                {agg.avg_rating}
+              </span>
+            </div>
+          )}
         </div>
         <div className="mt-2 px-1">
           <h3 className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
