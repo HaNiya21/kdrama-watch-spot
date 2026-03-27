@@ -7,6 +7,7 @@ import DramaCard from "@/components/DramaCard";
 import WatchlistTracker from "@/components/WatchlistTracker";
 import AuthModal from "@/components/AuthModal";
 import { getDramaById, dramas } from "@/data/dramas";
+import { useAggregateRating } from "@/hooks/useAggregateRatings";
 
 const DramaDetail = () => {
   const { id } = useParams<{ id: string }>();
