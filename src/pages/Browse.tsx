@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Loader2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import DramaCard from "@/components/DramaCard";
 import { discoverKDramas, searchKDramas, fetchTopRatedKDramas } from "@/lib/tmdb";
@@ -27,7 +27,7 @@ const Browse = () => {
 
   const [query, setQuery] = useState(initialQuery);
   const [selectedGenre, setSelectedGenre] = useState(genreFilter);
-  const [page, setPage] = useState(1);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Search mode
   const { data: searchResults, isLoading: searchLoading } = useQuery({
@@ -45,19 +45,51 @@ const Browse = () => {
     staleTime: 1000 * 60 * 10,
   });
 
-  // Discover mode (default)
-  const { data: discoverData, isLoading: discoverLoading } = useQuery({
-    queryKey: ["tmdb-discover", page, selectedGenre, filter],
-    queryFn: () => discoverKDramas(page, selectedGenre || undefined, filter === "trending" ? "popularity.desc" : undefined),
+  // Infinite discover mode
+  const {
+    data: discoverData,
+    isLoading: discoverLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["tmdb-discover-infinite", selectedGenre, filter],
+    queryFn: ({ pageParam = 1 }) =>
+      discoverKDramas(pageParam, selectedGenre || undefined, filter === "trending" ? "popularity.desc" : undefined),
+    getNextPageParam: (lastPage, allPages) => {
+      const nextPage = allPages.length + 1;
+      return nextPage <= lastPage.totalPages ? nextPage : undefined;
+    },
+    initialPageParam: 1,
     enabled: !query.trim() && filter !== "top-rated",
     staleTime: 1000 * 60 * 5,
   });
 
+  // Intersection observer for infinite scroll
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(handleObserver, { rootMargin: "400px" });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [handleObserver]);
+
   const isLoading = searchLoading || topRatedLoading || discoverLoading;
 
-  let dramas = discoverData?.dramas || [];
-  const totalPages = discoverData?.totalPages || 1;
+  // Flatten infinite pages
+  const discoverDramas = discoverData?.pages.flatMap(p => p.dramas) || [];
 
+  let dramas = discoverDramas;
   if (query.trim() && searchResults) {
     dramas = searchResults;
   } else if (filter === "top-rated" && topRated) {
@@ -72,7 +104,7 @@ const Browse = () => {
           {filter === "top-rated" ? "Top Rated" : filter === "trending" ? "Trending" : "Browse"} K-Dramas
         </h1>
         <p className="text-muted-foreground mb-8">
-          {dramas.length} drama{dramas.length !== 1 ? "s" : ""} found
+          {dramas.length} drama{dramas.length !== 1 ? "s" : ""} loaded
         </p>
 
         <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -80,7 +112,7 @@ const Browse = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={query}
-              onChange={(e) => { setQuery(e.target.value); setPage(1); }}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by title..."
               className="w-full bg-card border border-border text-foreground pl-10 pr-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground"
             />
@@ -90,7 +122,7 @@ const Browse = () => {
             {GENRE_OPTIONS.map(g => (
               <button
                 key={g.id}
-                onClick={() => { setSelectedGenre(g.id === selectedGenre ? "" : g.id); setPage(1); }}
+                onClick={() => setSelectedGenre(g.id === selectedGenre ? "" : g.id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   selectedGenre === g.id || (!selectedGenre && !g.id)
                     ? "bg-primary text-primary-foreground"
@@ -111,7 +143,7 @@ const Browse = () => {
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {dramas.map((drama, i) => (
-                <DramaCard key={drama.id} drama={drama} index={i} />
+                <DramaCard key={`${drama.id}-${i}`} drama={drama} index={i < 20 ? i : 0} />
               ))}
             </div>
 
@@ -121,27 +153,18 @@ const Browse = () => {
               </div>
             )}
 
-            {/* Pagination */}
-            {!query.trim() && filter !== "top-rated" && totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                  className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-40 hover:bg-secondary/80 transition-colors"
-                >
-                  Previous
-                </button>
-                <span className="text-sm text-muted-foreground px-3">
-                  Page {page} of {totalPages}
-                </span>
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages}
-                  className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-40 hover:bg-secondary/80 transition-colors"
-                >
-                  Next
-                </button>
+            {/* Infinite scroll sentinel */}
+            <div ref={sentinelRef} className="h-1" />
+
+            {isFetchingNextPage && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading more...</span>
               </div>
+            )}
+
+            {!hasNextPage && dramas.length > 0 && !query.trim() && filter !== "top-rated" && (
+              <p className="text-center text-sm text-muted-foreground py-8">You've reached the end!</p>
             )}
           </>
         )}
