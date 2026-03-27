@@ -1,3 +1,23 @@
+// Poster imports
+import posterCLOY from "@/assets/posters/crash-landing-on-you.jpg";
+import posterGoblin from "@/assets/posters/goblin.jpg";
+import posterDOTS from "@/assets/posters/descendants-of-the-sun.jpg";
+import posterMLFTS from "@/assets/posters/my-love-from-the-star.jpg";
+import posterItaewon from "@/assets/posters/itaewon-class.jpg";
+import posterVincenzo from "@/assets/posters/vincenzo.jpg";
+import posterStartUp from "@/assets/posters/start-up.jpg";
+import posterReply from "@/assets/posters/reply-1988.jpg";
+
+// Backdrop imports
+import backdropCLOY from "@/assets/backdrops/crash-landing-on-you.jpg";
+import backdropGoblin from "@/assets/backdrops/goblin.jpg";
+import backdropDOTS from "@/assets/backdrops/descendants-of-the-sun.jpg";
+import backdropMLFTS from "@/assets/backdrops/my-love-from-the-star.jpg";
+import backdropItaewon from "@/assets/backdrops/itaewon-class.jpg";
+import backdropVincenzo from "@/assets/backdrops/vincenzo.jpg";
+import backdropStartUp from "@/assets/backdrops/start-up.jpg";
+import backdropReply from "@/assets/backdrops/reply-1988.jpg";
+
 export interface Drama {
   id: string;
   title: string;
@@ -21,8 +41,8 @@ export const dramas: Drama[] = [
     id: "crash-landing-on-you",
     title: "Crash Landing on You",
     titleKorean: "사랑의 불시착",
-    poster: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=1200&h=600&fit=crop",
+    poster: posterCLOY,
+    backdrop: backdropCLOY,
     synopsis: "A South Korean heiress crash-lands in North Korea after a paragliding accident and falls in love with a North Korean army officer who helps hide her.",
     genres: ["Romance", "Comedy", "Drama"],
     tags: ["enemies-to-lovers", "forbidden-love", "military", "cross-border", "slow-burn"],
@@ -43,8 +63,8 @@ export const dramas: Drama[] = [
     id: "goblin",
     title: "Goblin: The Lonely and Great God",
     titleKorean: "쓸쓸하고 찬란하神 – 도깨비",
-    poster: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&h=600&fit=crop",
+    poster: posterGoblin,
+    backdrop: backdropGoblin,
     synopsis: "A goblin who needs a human bride to end his immortal life meets a grim reaper and a bubbly high school student who claims to be the goblin's bride.",
     genres: ["Fantasy", "Romance", "Drama"],
     tags: ["supernatural", "immortality", "reincarnation", "fate", "slow-burn", "tearjerker"],
@@ -65,8 +85,8 @@ export const dramas: Drama[] = [
     id: "descendants-of-the-sun",
     title: "Descendants of the Sun",
     titleKorean: "태양의 후예",
-    poster: "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=1200&h=600&fit=crop",
+    poster: posterDOTS,
+    backdrop: backdropDOTS,
     synopsis: "A special forces captain and a doctor navigate their complicated relationship while stationed in a war-torn country.",
     genres: ["Romance", "Action", "Drama"],
     tags: ["military", "doctor", "long-distance", "action-romance", "strong-leads"],
@@ -85,8 +105,8 @@ export const dramas: Drama[] = [
     id: "my-love-from-the-star",
     title: "My Love from the Star",
     titleKorean: "별에서 온 그대",
-    poster: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=1200&h=600&fit=crop",
+    poster: posterMLFTS,
+    backdrop: backdropMLFTS,
     synopsis: "An alien who landed on Earth 400 years ago falls in love with a top actress in modern-day Seoul, just as he's about to return home.",
     genres: ["Romance", "Comedy", "Sci-Fi"],
     tags: ["alien", "celebrity", "supernatural", "comedy", "fate"],
@@ -105,8 +125,8 @@ export const dramas: Drama[] = [
     id: "itaewon-class",
     title: "Itaewon Class",
     titleKorean: "이태원 클라쓰",
-    poster: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&h=600&fit=crop",
+    poster: posterItaewon,
+    backdrop: backdropItaewon,
     synopsis: "An ex-con opens a bar in Itaewon and fights to take down the food conglomerate that destroyed his family.",
     genres: ["Drama", "Romance", "Business"],
     tags: ["revenge", "underdog", "found-family", "strong-female-lead", "food"],
@@ -125,8 +145,8 @@ export const dramas: Drama[] = [
     id: "vincenzo",
     title: "Vincenzo",
     titleKorean: "빈센조",
-    poster: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?w=1200&h=600&fit=crop",
+    poster: posterVincenzo,
+    backdrop: backdropVincenzo,
     synopsis: "A Korean-Italian mafia consigliere returns to Seoul to recover gold hidden in a building, teaming up with a feisty lawyer.",
     genres: ["Action", "Comedy", "Crime"],
     tags: ["mafia", "dark-comedy", "revenge", "anti-hero", "ensemble-cast"],
@@ -145,8 +165,8 @@ export const dramas: Drama[] = [
     id: "start-up",
     title: "Start-Up",
     titleKorean: "스타트업",
-    poster: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=1200&h=600&fit=crop",
+    poster: posterStartUp,
+    backdrop: backdropStartUp,
     synopsis: "Young entrepreneurs compete in Korea's Silicon Valley, navigating love, ambition, and the harsh realities of the startup world.",
     genres: ["Romance", "Drama", "Business"],
     tags: ["love-triangle", "tech", "underdog", "family", "coming-of-age"],
@@ -165,8 +185,8 @@ export const dramas: Drama[] = [
     id: "reply-1988",
     title: "Reply 1988",
     titleKorean: "응답하라 1988",
-    poster: "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=1200&h=600&fit=crop",
+    poster: posterReply,
+    backdrop: backdropReply,
     synopsis: "Five families living in the same neighborhood in Seoul in 1988 share their joys and sorrows while their children navigate youth and love.",
     genres: ["Drama", "Comedy", "Romance"],
     tags: ["nostalgia", "slice-of-life", "friendship", "family", "coming-of-age", "tearjerker"],
