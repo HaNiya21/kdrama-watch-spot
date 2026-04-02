@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X, User, LogOut, BookmarkCheck, Sparkles } from "lucide-react";
+import { Search, Menu, X, User, LogOut, BookmarkCheck, Sparkles, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthModal from "./AuthModal";
@@ -36,6 +36,9 @@ const Navbar = () => {
             <Link to="/browse" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Browse</Link>
             <Link to="/recommendations" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors flex items-center gap-1">
               <Sparkles className="w-4 h-4" /> For You
+            </Link>
+            <Link to="/community" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors flex items-center gap-1">
+              <Users className="w-4 h-4" /> Community
             </Link>
             {user && (
               <Link to="/watchlist" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors flex items-center gap-1">
@@ -114,6 +117,7 @@ const Navbar = () => {
               <div className="flex flex-col p-4 gap-3">
                 <Link to="/" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Home</Link>
                 <Link to="/browse" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Browse</Link>
+                <Link to="/community" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Community</Link>
                 {user && <Link to="/watchlist" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">My Watchlist</Link>}
               </div>
             </motion.div>

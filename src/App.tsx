@@ -9,6 +9,7 @@ import Browse from "./pages/Browse.tsx";
 import DramaDetail from "./pages/DramaDetail.tsx";
 import Watchlist from "./pages/Watchlist.tsx";
 import Recommendations from "./pages/Recommendations.tsx";
+import Community from "./pages/Community.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/drama/:id" element={<DramaDetail />} />
             <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/recommendations" element={<Recommendations />} />
+            <Route path="/community" element={<Community />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
