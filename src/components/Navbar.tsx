@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X, User, LogOut, BookmarkCheck, Sparkles } from "lucide-react";
+import { Search, Menu, X, User, LogOut, BookmarkCheck, Sparkles, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthModal from "./AuthModal";
