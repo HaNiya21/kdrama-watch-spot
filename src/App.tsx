@@ -27,6 +27,7 @@ const App = () => (
             <Route path="/drama/:id" element={<DramaDetail />} />
             <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/recommendations" element={<Recommendations />} />
+            <Route path="/community" element={<Community />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

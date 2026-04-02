@@ -117,6 +117,7 @@ const Navbar = () => {
               <div className="flex flex-col p-4 gap-3">
                 <Link to="/" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Home</Link>
                 <Link to="/browse" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Browse</Link>
+                <Link to="/community" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Community</Link>
                 {user && <Link to="/watchlist" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">My Watchlist</Link>}
               </div>
             </motion.div>
