@@ -82,6 +82,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_community_feed: {
+        Args: { _limit?: number }
+        Returns: {
+          display_name: string
+          drama_id: string
+          id: string
+          notes: string
+          rating: number
+          status: string
+          updated_at: string
+        }[]
+      }
       get_drama_aggregate_ratings: {
         Args: never
         Returns: {
