@@ -42,36 +42,6 @@ const NetflixGuide = () => {
     staleTime: 1000 * 60 * 30,
   });
 
-  useEffect(() => {
-    const prevTitle = document.title;
-    document.title = TITLE;
-
-    // meta description
-    let meta = document.querySelector('meta[name="description"]');
-    const prevDesc = meta?.getAttribute("content") ?? null;
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.setAttribute("name", "description");
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute("content", DESCRIPTION);
-
-    // canonical
-    let canonical = document.querySelector('link[rel="canonical"]');
-    const prevCanonical = canonical?.getAttribute("href") ?? null;
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.setAttribute("rel", "canonical");
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute("href", CANONICAL);
-
-    return () => {
-      document.title = prevTitle;
-      if (prevDesc !== null) meta!.setAttribute("content", prevDesc);
-      if (prevCanonical !== null) canonical!.setAttribute("href", prevCanonical);
-    };
-  }, []);
 
   const topRated = (data?.dramas || []).filter((d) => d.rating >= 7).slice(0, 24);
   const trending = (popular?.dramas || []).slice(0, 12);
@@ -100,11 +70,14 @@ const NetflixGuide = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={TITLE}
+        description={DESCRIPTION}
+        path="/best-korean-dramas-on-netflix"
+        jsonLd={[itemListLd, faqLd]}
+      />
       <Navbar />
 
-      {/* JSON-LD */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
 
       <main className="container mx-auto px-4 pt-24 pb-16 max-w-6xl">
         {/* Breadcrumb */}
