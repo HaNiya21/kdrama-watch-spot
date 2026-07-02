@@ -56,11 +56,17 @@ const DramaDetail = () => {
     );
   }
 
+  const baseTitle = drama.year ? `${drama.title} (${drama.year})` : drama.title;
+  const seoTitleFull = `${baseTitle} — Where to Watch`;
+  const seoTitle = seoTitleFull.length <= 60 ? seoTitleFull : baseTitle.slice(0, 60);
+  const rawDesc = drama.synopsis || `Watch ${drama.title}, a Korean drama. Cast, ratings, episodes, and where to stream it.`;
+  const seoDesc = rawDesc.length <= 160 ? rawDesc : rawDesc.slice(0, 157).trimEnd() + "…";
+
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title={`${drama.title} (${drama.year || "K-Drama"}) — Cast, Rating & Where to Watch`}
-        description={(drama.synopsis || `Watch ${drama.title}, a Korean drama.`).slice(0, 200)}
+        title={seoTitle}
+        description={seoDesc}
         path={`/drama/${drama.id}`}
         type="video.tv_show"
         image={drama.poster}
