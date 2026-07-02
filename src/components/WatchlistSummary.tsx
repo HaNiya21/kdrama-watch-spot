@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
-  Loader2, Tv, PlayCircle, CheckCircle2, PauseCircle, BookmarkPlus, XCircle,
+  Loader2, Tv, PlayCircle, CheckCircle2, PauseCircle, Bookmark, XCircle,
   Star, Plus, Check,
 } from "lucide-react";
 import {
@@ -27,7 +27,7 @@ function timeAgo(iso: string) {
 
 const statusIcon: Record<WatchStatus, React.ReactNode> = {
   watching: <PlayCircle className="w-4 h-4" />,
-  want_to_watch: <BookmarkPlus className="w-4 h-4" />,
+  want_to_watch: <Bookmark className="w-4 h-4" />,
   completed: <CheckCircle2 className="w-4 h-4" />,
   paused: <PauseCircle className="w-4 h-4" />,
   dropped: <XCircle className="w-4 h-4" />,
