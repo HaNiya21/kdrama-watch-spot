@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import { Star, Calendar, Tv, PlayCircle, ArrowLeft, Users, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -57,6 +58,32 @@ const DramaDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`${drama.title} (${drama.year || "K-Drama"}) — Cast, Rating & Where to Watch`}
+        description={(drama.synopsis || `Watch ${drama.title}, a Korean drama.`).slice(0, 200)}
+        path={`/drama/${drama.id}`}
+        type="video.tv_show"
+        image={drama.poster}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "TVSeries",
+          name: drama.title,
+          alternateName: drama.titleKorean || undefined,
+          image: drama.poster,
+          description: drama.synopsis,
+          genre: drama.genres,
+          numberOfEpisodes: drama.episodes || undefined,
+          datePublished: drama.year ? String(drama.year) : undefined,
+          aggregateRating: drama.rating
+            ? {
+                "@type": "AggregateRating",
+                ratingValue: drama.rating,
+                bestRating: 10,
+                ratingCount: Math.max(agg?.rating_count || 1, 1),
+              }
+            : undefined,
+        }}
+      />
       <Navbar />
 
       <div className="relative h-[50vh] md:h-[60vh]">

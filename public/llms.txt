@@ -1,0 +1,18 @@
+# KDramaDex
+
+> KDramaDex is a discovery, tracking, and recommendation platform for Korean dramas — combining IMDb-style browsing, MyAnimeList-style episode tracking, and Netflix-style personalized picks.
+
+Users can browse trending and top-rated K-dramas, save titles to a personal watchlist with per-episode progress, rate and review dramas they've watched, follow the community feed, and get recommendations based on their taste profile.
+
+## Pages
+
+- [Home](/): Trending K-dramas, top-rated titles, and popular genres.
+- [Browse](/browse): Full K-drama catalog with search, genre filters, and infinite scroll.
+- [For You](/recommendations): Personalized K-drama recommendations based on the signed-in user's ratings and watchlist.
+- [Community](/community): Recent ratings, reviews, and activity from other KDramaDex members.
+- [Best Korean Dramas on Netflix](/best-korean-dramas-on-netflix): Curated guide to the top-rated K-dramas currently streaming on Netflix.
+
+## Optional
+
+- [My Watchlist](/watchlist): Signed-in user's saved dramas and episode progress (requires sign-in).
+- [Profile](/profile): Signed-in user's profile, watchlist summary, and recent ratings (requires sign-in).

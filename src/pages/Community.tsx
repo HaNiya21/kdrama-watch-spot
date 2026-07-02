@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import SEO from "@/components/SEO";
 import { Star, MessageSquare, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchKDramaDetails } from "@/lib/tmdb";
@@ -146,6 +147,11 @@ const Community = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="K-Drama Community Reviews & Ratings — KDramaDex"
+        description="See what other K-drama fans are watching, rating, and reviewing. Recent activity from the KDramaDex community."
+        path="/community"
+      />
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-16 max-w-2xl">
         <h1 className="text-3xl font-display text-gradient mb-2">Community</h1>
