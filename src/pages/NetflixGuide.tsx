@@ -1,12 +1,11 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Play, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 import DramaCard from "@/components/DramaCard";
 import { fetchNetflixKDramas } from "@/lib/tmdb";
 
-const CANONICAL = "https://kdrama-watch-spot.lovable.app/best-korean-dramas-on-netflix";
 const TITLE = "Best Korean Dramas on Netflix (2026) — KDramaDex";
 const DESCRIPTION =
   "The best Korean dramas streaming on Netflix right now — a curated, ratings-driven guide covering romance, thriller, historical, and fantasy K-dramas Netflix subscribers can watch tonight.";
