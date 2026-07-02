@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import DramaCard from "@/components/DramaCard";
+import DramaFAQ from "@/components/DramaFAQ";
 import WatchlistTracker from "@/components/WatchlistTracker";
 import AuthModal from "@/components/AuthModal";
 import { fetchKDramaDetails, fetchTrendingKDramas } from "@/lib/tmdb";
@@ -169,6 +170,8 @@ const DramaDetail = () => {
             )}
           </motion.div>
         </div>
+
+        <DramaFAQ drama={drama} />
 
         {similarDramas.length > 0 && (
           <section className="mt-16">
