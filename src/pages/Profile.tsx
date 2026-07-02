@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Calendar, Clock, Mail, User as UserIcon, Loader2, Pencil, Check, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import WatchlistSummary from "@/components/WatchlistSummary";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -184,6 +185,12 @@ const Profile = () => {
               </Row>
             </dl>
           </div>
+
+          <section className="mt-8 bg-card border border-border rounded-2xl p-6 md:p-8 shadow-[var(--shadow-card)]">
+            <h2 className="text-2xl font-display text-foreground mb-1">Watchlist</h2>
+            <p className="text-sm text-muted-foreground mb-6">Your tracking activity at a glance</p>
+            <WatchlistSummary />
+          </section>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
