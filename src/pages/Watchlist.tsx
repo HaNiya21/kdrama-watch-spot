@@ -100,7 +100,18 @@ const Watchlist = () => {
         </div>
 
         {loading ? (
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="grid gap-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="bg-card border border-border rounded-lg p-4 flex gap-4 items-start animate-pulse">
+                <div className="w-16 h-24 rounded-md bg-secondary" />
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-4 w-1/3 bg-secondary rounded" />
+                  <div className="h-3 w-1/2 bg-secondary rounded" />
+                  <div className="h-8 w-32 bg-secondary rounded mt-3" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-20">
             <BookmarkX className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -119,8 +130,11 @@ const Watchlist = () => {
                 )}
                 <div className="grid gap-3">
                   {items.map((entry, i) => {
+                    const query = dramaQueries[dramaIds.indexOf(entry.drama_id)];
                     const drama = dramaById.get(entry.drama_id);
-                    if (!drama) return null;
+                    const isLoading = query?.isLoading;
+                    const isError = query?.isError;
+
                     return (
                       <motion.div
                         key={entry.id}
@@ -129,16 +143,50 @@ const Watchlist = () => {
                         transition={{ delay: i * 0.03 }}
                         className="bg-card border border-border rounded-lg p-4 flex gap-4 items-start"
                       >
-                        <Link to={`/drama/${drama.id}`} className="w-16 flex-shrink-0">
-                          <img src={drama.poster} alt={drama.title} className="w-full rounded-md" />
-                        </Link>
-                        <div className="flex-1 min-w-0">
-                          <Link to={`/drama/${drama.id}`} className="text-foreground font-medium hover:text-primary transition-colors">
-                            {drama.title}
+                        {drama ? (
+                          <Link to={`/drama/${drama.id}`} className="w-16 flex-shrink-0">
+                            <img src={drama.poster} alt={drama.title} className="w-full rounded-md" />
                           </Link>
-                          <p className="text-xs text-muted-foreground mt-0.5">{drama.genres.join(" · ")} · {drama.year}</p>
+                        ) : (
+                          <div className="w-16 h-24 rounded-md bg-secondary flex-shrink-0 animate-pulse" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          {drama ? (
+                            <>
+                              <Link to={`/drama/${drama.id}`} className="text-foreground font-medium hover:text-primary transition-colors">
+                                {drama.title}
+                              </Link>
+                              <p className="text-xs text-muted-foreground mt-0.5">{drama.genres.join(" · ")} · {drama.year}</p>
+                            </>
+                          ) : isLoading ? (
+                            <div className="space-y-2 py-1">
+                              <div className="h-4 w-1/3 bg-secondary rounded animate-pulse" />
+                              <div className="h-3 w-1/2 bg-secondary rounded animate-pulse" />
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="text-sm text-destructive font-medium">
+                                {isError ? "Couldn't load drama details" : "Drama unavailable"}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                ID: {entry.drama_id}
+                                {query && (
+                                  <button
+                                    onClick={() => query.refetch()}
+                                    className="ml-2 text-primary hover:underline"
+                                  >
+                                    Retry
+                                  </button>
+                                )}
+                              </p>
+                            </div>
+                          )}
                           <div className="mt-2">
-                            <WatchlistTracker dramaId={drama.id} totalEpisodes={drama.episodes} onAuthRequired={() => {}} />
+                            <WatchlistTracker
+                              dramaId={entry.drama_id}
+                              totalEpisodes={drama?.episodes ?? entry.total_episodes ?? 0}
+                              onAuthRequired={() => {}}
+                            />
                           </div>
                         </div>
                       </motion.div>
