@@ -16,7 +16,15 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src={heroBg} alt="" className="w-full h-full object-cover" />
+        <img
+          src={heroBg}
+          alt=""
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+          decoding="async"
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-transparent" />
       </div>

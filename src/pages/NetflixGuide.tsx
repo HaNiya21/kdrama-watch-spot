@@ -8,7 +8,7 @@ import { fetchNetflixKDramas } from "@/lib/tmdb";
 
 const TITLE = "Best Korean Dramas on Netflix (2026) — KDramaDex";
 const DESCRIPTION =
-  "The best Korean dramas streaming on Netflix right now — a curated, ratings-driven guide covering romance, thriller, historical, and fantasy K-dramas Netflix subscribers can watch tonight.";
+  "The best Korean dramas on Netflix right now — a curated, ratings-driven guide across romance, thriller, historical, and fantasy K-dramas.";
 
 const FAQS = [
   {
