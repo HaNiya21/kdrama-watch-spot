@@ -89,6 +89,9 @@ const Navbar = () => {
                       className="absolute right-0 top-full mt-2 bg-card border border-border rounded-lg shadow-[var(--shadow-card)] overflow-hidden min-w-[180px] z-50"
                     >
                       <p className="px-4 py-2 text-xs text-muted-foreground truncate border-b border-border">{user.email}</p>
+                      <Link to="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors">
+                        <User className="w-4 h-4" /> Profile
+                      </Link>
                       <Link to="/watchlist" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors">
                         <BookmarkCheck className="w-4 h-4" /> My Watchlist
                       </Link>
