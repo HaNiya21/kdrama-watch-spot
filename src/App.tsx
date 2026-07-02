@@ -31,6 +31,7 @@ const App = () => (
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/community" element={<Community />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/best-korean-dramas-on-netflix" element={<NetflixGuide />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
