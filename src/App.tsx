@@ -12,6 +12,7 @@ import Recommendations from "./pages/Recommendations.tsx";
 import Community from "./pages/Community.tsx";
 import Profile from "./pages/Profile.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import NetflixGuide from "./pages/NetflixGuide.tsx";
 
 const queryClient = new QueryClient();
 
