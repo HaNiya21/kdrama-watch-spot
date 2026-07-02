@@ -119,7 +119,7 @@ const Watchlist = () => {
                 )}
                 <div className="grid gap-3">
                   {items.map((entry, i) => {
-                    const drama = getDramaById(entry.drama_id);
+                    const drama = dramaById.get(entry.drama_id);
                     if (!drama) return null;
                     return (
                       <motion.div
