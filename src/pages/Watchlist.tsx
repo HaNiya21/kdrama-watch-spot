@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useQueries } from "@tanstack/react-query";
 import { BookmarkX } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +12,7 @@ import {
   statusColors,
   getUserWatchlist,
 } from "@/lib/watchlist";
-import { getDramaById } from "@/data/dramas";
+import { fetchKDramaDetails } from "@/lib/tmdb";
 import WatchlistTracker from "@/components/WatchlistTracker";
 
 const statusOrder: WatchStatus[] = ["watching", "want_to_watch", "paused", "completed", "dropped"];
@@ -32,6 +33,22 @@ const Watchlist = () => {
       setLoading(false);
     }
   }, [user]);
+
+  const dramaIds = useMemo(() => Array.from(new Set(entries.map((e) => e.drama_id))), [entries]);
+  const dramaQueries = useQueries({
+    queries: dramaIds.map((id) => ({
+      queryKey: ["tmdb-detail", id],
+      queryFn: () => fetchKDramaDetails(id),
+      staleTime: 1000 * 60 * 15,
+    })),
+  });
+  const dramaById = useMemo(() => {
+    const map = new Map<string, Awaited<ReturnType<typeof fetchKDramaDetails>>>();
+    dramaQueries.forEach((q, i) => {
+      if (q.data) map.set(dramaIds[i], q.data);
+    });
+    return map;
+  }, [dramaQueries, dramaIds]);
 
   if (!user) {
     return (
