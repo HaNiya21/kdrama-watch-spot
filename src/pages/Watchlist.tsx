@@ -73,6 +73,12 @@ const Watchlist = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="My K-Drama Watchlist — KDramaDex"
+        description="Your personal K-drama watchlist: track episode progress and manage what you're watching, planning to watch, or completed."
+        path="/watchlist"
+        noindex
+      />
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-16">
         <h1 className="text-4xl font-display text-foreground mb-2">My Watchlist</h1>
