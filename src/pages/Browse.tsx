@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom";
+import SEO from "@/components/SEO";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
@@ -98,6 +99,11 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={query ? `Search: ${query} — KDramaDex` : "Browse Korean Dramas — KDramaDex"}
+        description="Browse the full catalog of Korean dramas by genre, popularity, or top ratings. Search romance, thriller, historical, and fantasy K-dramas."
+        path="/browse"
+      />
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-16">
         <h1 className="text-4xl font-display text-foreground mb-2">

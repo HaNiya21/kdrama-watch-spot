@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import { Sparkles, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
@@ -47,6 +48,22 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="KDramaDex — Discover, Track & Rate Korean Dramas"
+        description="Discover trending Korean dramas, track episode progress, and get personalized K-drama recommendations. Your complete K-drama companion."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "KDramaDex",
+          url: "https://kdrama-watch-spot.lovable.app",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://kdrama-watch-spot.lovable.app/browse?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }}
+      />
       <Navbar />
       <HeroSection />
       <main className="container mx-auto px-4 pb-16">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SEO from "@/components/SEO";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Calendar, Clock, Mail, User as UserIcon, Loader2, Pencil, Check, X } from "lucide-react";
@@ -103,6 +104,12 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="My Profile — KDramaDex"
+        description="Your KDramaDex profile: watchlist summary, recent episode progress, and ratings."
+        path="/profile"
+        noindex
+      />
       <Navbar />
 
       <main className="container mx-auto px-4 pt-24 pb-16 max-w-3xl">

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import { motion } from "framer-motion";
 import { Sparkles, Compass, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -54,6 +55,11 @@ const Recommendations = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="K-Drama Recommendations For You — KDramaDex"
+        description="Personalized Korean drama recommendations based on your watchlist and ratings. Discover your next favorite K-drama."
+        path="/recommendations"
+      />
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-16">
         <div className="flex items-center gap-3 mb-2">
