@@ -31,7 +31,12 @@ serve(async (req) => {
         const page = params?.page || 1;
         const sortBy = params?.sort_by || "popularity.desc";
         const genres = params?.genre_ids || "";
-        url = `${TMDB_BASE}/discover/tv?api_key=${TMDB_API_KEY}&with_original_language=ko&sort_by=${sortBy}&page=${page}&with_genres=${genres}&include_adult=false`;
+        const watchProviders = params?.with_watch_providers || "";
+        const watchRegion = params?.watch_region || "";
+        const providerQs = watchProviders
+          ? `&with_watch_providers=${watchProviders}&watch_region=${watchRegion || "US"}&with_watch_monetization_types=flatrate`
+          : "";
+        url = `${TMDB_BASE}/discover/tv?api_key=${TMDB_API_KEY}&with_original_language=ko&sort_by=${sortBy}&page=${page}&with_genres=${genres}&include_adult=false${providerQs}`;
         break;
       }
       case "trending": {
