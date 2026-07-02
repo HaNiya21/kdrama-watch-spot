@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookmarkPlus, ChevronDown, Minus, Plus, Star, Trash2, MessageSquare, Check } from "lucide-react";
+import { Bookmark, ChevronDown, Minus, Plus, Star, Trash2, MessageSquare, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { invalidateAggregateCache } from "@/hooks/useAggregateRatings";
 import {
@@ -64,15 +64,42 @@ const WatchlistTracker = ({ dramaId, totalEpisodes, onAuthRequired }: WatchlistT
   };
 
   if (!entry) {
+    const saveOptions: WatchStatus[] = ["want_to_watch", "watching", "completed", "paused", "dropped"];
     return (
-      <button
-        onClick={() => user ? handleStatusChange("want_to_watch") : onAuthRequired()}
-        disabled={loading}
-        className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
-      >
-        <BookmarkPlus className="w-5 h-5" />
-        Add to Watchlist
-      </button>
+      <div className="relative inline-block">
+        <button
+          onClick={() => user ? setShowDropdown(!showDropdown) : onAuthRequired()}
+          disabled={loading}
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+        >
+          <Bookmark className="w-5 h-5" />
+          Save
+          <ChevronDown className="w-4 h-4" />
+        </button>
+        <AnimatePresence>
+          {showDropdown && user && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-[var(--shadow-card)] overflow-hidden z-20 min-w-[200px]"
+            >
+              <div className="px-4 py-2 text-xs uppercase tracking-wide text-muted-foreground border-b border-border">
+                Save to
+              </div>
+              {saveOptions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => handleStatusChange(s)}
+                  className="block w-full text-left px-4 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
+                >
+                  {statusLabels[s]}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     );
   }
 
