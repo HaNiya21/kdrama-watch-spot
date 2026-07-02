@@ -62,13 +62,18 @@ const Navbar = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search dramas..."
+                    aria-label="Search dramas"
                     className="w-full bg-secondary text-foreground text-sm px-4 py-2 rounded-lg outline-none placeholder:text-muted-foreground"
                   />
                 </motion.form>
               )}
             </AnimatePresence>
 
-            <button onClick={() => setSearchOpen(!searchOpen)} className="p-2 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary transition-colors">
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              aria-label="Search"
+              className="p-2 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary transition-colors"
+            >
               <Search className="w-5 h-5" />
             </button>
 
@@ -108,7 +113,12 @@ const Navbar = () => {
               </button>
             )}
 
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary transition-colors">
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              className="md:hidden p-2 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary transition-colors"
+            >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>

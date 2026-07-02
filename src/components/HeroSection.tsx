@@ -41,6 +41,7 @@ const HeroSection = () => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search dramas, actors, genres..."
+                aria-label="Search dramas, actors, and genres"
                 className="w-full bg-card/80 backdrop-blur-xl border border-border text-foreground pl-12 pr-4 py-4 rounded-xl text-base outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground transition-all"
               />
             </div>
