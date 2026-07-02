@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
-  Loader2, Tv, PlayCircle, CheckCircle2, PauseCircle, BookmarkPlus, XCircle,
+  Loader2, Tv, PlayCircle, CheckCircle2, PauseCircle, Bookmark, XCircle,
   Star, Plus, Check,
 } from "lucide-react";
 import {
