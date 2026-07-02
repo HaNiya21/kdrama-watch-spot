@@ -167,3 +167,17 @@ export async function discoverKDramas(page = 1, genreId?: string, sortBy?: strin
     totalPages: Math.min(data.total_pages || 1, 20),
   };
 }
+
+// Netflix K-dramas (watch provider 8 = Netflix)
+export async function fetchNetflixKDramas(page = 1, sortBy = "vote_average.desc"): Promise<{ dramas: Drama[]; totalPages: number }> {
+  const data = await callProxy("discover", {
+    page,
+    sort_by: sortBy,
+    with_watch_providers: "8",
+    watch_region: "US",
+  });
+  return {
+    dramas: (data.results || []).map(mapTvToDrama),
+    totalPages: Math.min(data.total_pages || 1, 20),
+  };
+}

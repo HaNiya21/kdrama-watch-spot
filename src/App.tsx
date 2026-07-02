@@ -12,6 +12,7 @@ import Recommendations from "./pages/Recommendations.tsx";
 import Community from "./pages/Community.tsx";
 import Profile from "./pages/Profile.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import NetflixGuide from "./pages/NetflixGuide.tsx";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/community" element={<Community />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/best-korean-dramas-on-netflix" element={<NetflixGuide />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
