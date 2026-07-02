@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchKDramaDetails } from "@/lib/tmdb";
 import Navbar from "@/components/Navbar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface FeedEntry {
   id: string;
@@ -12,37 +13,17 @@ interface FeedEntry {
   notes: string | null;
   status: string;
   updated_at: string;
-  user_id: string;
   display_name: string | null;
 }
 
 const fetchCommunityFeed = async (): Promise<FeedEntry[]> => {
-  const { data, error } = await supabase
-    .from("watchlist")
-    .select("id, drama_id, rating, notes, status, updated_at, user_id")
-    .or("rating.not.is.null,notes.not.is.null")
-    .order("updated_at", { ascending: false })
-    .limit(50);
-
+  // Uses SECURITY DEFINER RPC that returns only review-safe fields (no user_id).
+  // RPC is granted only to authenticated role.
+  const { data, error } = await supabase.rpc("get_community_feed", { _limit: 50 });
   if (error) throw error;
-  if (!data || data.length === 0) return [];
-
-  // Fetch profile display names
-  const userIds = [...new Set(data.map((d) => d.user_id))];
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("user_id, display_name")
-    .in("user_id", userIds);
-
-  const profileMap = new Map(
-    (profiles || []).map((p) => [p.user_id, p.display_name])
-  );
-
-  return data.map((entry) => ({
-    ...entry,
-    display_name: profileMap.get(entry.user_id) || "Anonymous",
-  }));
+  return (data || []) as FeedEntry[];
 };
+
 
 const timeAgo = (dateStr: string) => {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -155,10 +136,12 @@ const FeedSkeleton = () => (
 );
 
 const Community = () => {
+  const { user } = useAuth();
   const { data: feed, isLoading } = useQuery({
     queryKey: ["community-feed"],
     queryFn: fetchCommunityFeed,
     staleTime: 1000 * 60 * 2,
+    enabled: !!user,
   });
 
   return (
@@ -170,25 +153,34 @@ const Community = () => {
           Recent ratings and reviews from fellow K-drama fans
         </p>
 
-        <div className="space-y-4">
-          {isLoading &&
-            Array.from({ length: 5 }).map((_, i) => <FeedSkeleton key={i} />)}
+        {!user ? (
+          <div className="text-center py-16 text-muted-foreground">
+            <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-40" />
+            <p className="text-lg font-medium">Sign in to see the community feed</p>
+            <p className="text-sm">Reviews from fellow fans are visible to signed-in members.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {isLoading &&
+              Array.from({ length: 5 }).map((_, i) => <FeedSkeleton key={i} />)}
 
-          {feed && feed.length === 0 && (
-            <div className="text-center py-16 text-muted-foreground">
-              <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-40" />
-              <p className="text-lg font-medium">No reviews yet</p>
-              <p className="text-sm">Be the first to rate and review a drama!</p>
-            </div>
-          )}
+            {feed && feed.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                <p className="text-lg font-medium">No reviews yet</p>
+                <p className="text-sm">Be the first to rate and review a drama!</p>
+              </div>
+            )}
 
-          {feed?.map((entry) => (
-            <FeedCard key={entry.id} entry={entry} />
-          ))}
-        </div>
+            {feed?.map((entry) => (
+              <FeedCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
 };
+
 
 export default Community;
