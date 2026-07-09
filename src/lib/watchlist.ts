@@ -64,7 +64,7 @@ export async function upsertWatchlistEntry(
       { user_id: user.id, drama_id: dramaId, ...updates },
       { onConflict: "user_id,drama_id" }
     )
-    .select()
+    .select(WATCHLIST_COLUMNS)
     .single();
 
   if (error) throw error;
