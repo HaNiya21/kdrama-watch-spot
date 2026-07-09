@@ -11,7 +11,7 @@ let cache: Record<string, AggregateRating> | null = null;
 let fetchPromise: Promise<void> | null = null;
 
 async function fetchAll() {
-  const { data } = await supabase.rpc("get_drama_aggregate_ratings");
+  const { data } = await supabase.from("drama_aggregate_ratings").select("*");
   if (data) {
     cache = {};
     for (const row of data as AggregateRating[]) {

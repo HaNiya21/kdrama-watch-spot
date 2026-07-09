@@ -18,9 +18,12 @@ interface FeedEntry {
 }
 
 const fetchCommunityFeed = async (): Promise<FeedEntry[]> => {
-  // Uses SECURITY DEFINER RPC that returns only review-safe fields (no user_id).
-  // RPC is granted only to authenticated role.
-  const { data, error } = await supabase.rpc("get_community_feed", { _limit: 50 });
+  // Reads from a security_invoker view that exposes review-safe columns (no user_id).
+  const { data, error } = await supabase
+    .from("community_feed")
+    .select("*")
+    .order("updated_at", { ascending: false })
+    .limit(50);
   if (error) throw error;
   return (data || []) as FeedEntry[];
 };

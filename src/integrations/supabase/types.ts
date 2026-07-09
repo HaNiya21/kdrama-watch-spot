@@ -79,7 +79,26 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      community_feed: {
+        Row: {
+          display_name: string | null
+          drama_id: string | null
+          id: string | null
+          notes: string | null
+          rating: number | null
+          status: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
+      drama_aggregate_ratings: {
+        Row: {
+          avg_rating: number | null
+          drama_id: string | null
+          rating_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_community_feed: {

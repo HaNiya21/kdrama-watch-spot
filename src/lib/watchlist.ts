@@ -31,10 +31,13 @@ export const statusColors: Record<WatchStatus, string> = {
   dropped: "bg-destructive text-destructive-foreground",
 };
 
+const WATCHLIST_COLUMNS =
+  "id, drama_id, status, current_episode, total_episodes, rating, notes, created_at, updated_at";
+
 export async function getWatchlistEntry(dramaId: string): Promise<WatchlistEntry | null> {
   const { data } = await supabase
     .from("watchlist")
-    .select("*")
+    .select(WATCHLIST_COLUMNS)
     .eq("drama_id", dramaId)
     .maybeSingle();
   return data as WatchlistEntry | null;
@@ -43,7 +46,7 @@ export async function getWatchlistEntry(dramaId: string): Promise<WatchlistEntry
 export async function getUserWatchlist(): Promise<WatchlistEntry[]> {
   const { data } = await supabase
     .from("watchlist")
-    .select("*")
+    .select(WATCHLIST_COLUMNS)
     .order("updated_at", { ascending: false });
   return (data as WatchlistEntry[]) || [];
 }
@@ -61,7 +64,7 @@ export async function upsertWatchlistEntry(
       { user_id: user.id, drama_id: dramaId, ...updates },
       { onConflict: "user_id,drama_id" }
     )
-    .select()
+    .select(WATCHLIST_COLUMNS)
     .single();
 
   if (error) throw error;
