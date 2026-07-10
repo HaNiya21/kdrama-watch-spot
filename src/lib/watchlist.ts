@@ -58,17 +58,20 @@ export async function upsertWatchlistEntry(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data, error } = await supabase
+  // Write without RETURNING — the column-level RLS on `watchlist` (user_id is
+  // not granted to authenticated) makes PostgREST's default returning path
+  // fail with "permission denied for table watchlist". We re-fetch after.
+  const { error } = await supabase
     .from("watchlist")
     .upsert(
       { user_id: user.id, drama_id: dramaId, ...updates },
       { onConflict: "user_id,drama_id" }
-    )
-    .select(WATCHLIST_COLUMNS)
-    .single();
+    );
 
   if (error) throw error;
-  return data as WatchlistEntry;
+  const entry = await getWatchlistEntry(dramaId);
+  if (!entry) throw new Error("Failed to load watchlist entry after save");
+  return entry;
 }
 
 export async function removeFromWatchlist(dramaId: string) {
