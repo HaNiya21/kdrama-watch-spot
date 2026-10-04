@@ -1,11 +1,11 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, User, Tv } from "lucide-react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import DramaCard from "@/components/DramaCard";
-import { discoverKDramas, searchKDramas, fetchTopRatedKDramas } from "@/lib/tmdb";
+import { discoverKDramas, searchKDramas, searchPeople, searchNetworks, fetchTopRatedKDramas } from "@/lib/tmdb";
 
 const GENRE_OPTIONS = [
   { id: "", label: "All" },
