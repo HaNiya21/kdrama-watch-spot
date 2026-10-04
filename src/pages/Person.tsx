@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowLeft, Loader2, Star, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import FollowButton from "@/components/FollowButton";
 import { fetchPerson, type PersonCredit } from "@/lib/tmdb";
 
 type Filter = "all" | "tv" | "movie";
@@ -79,6 +80,7 @@ const Person = () => {
               )}
               <div className="flex-1">
                 <h1 className="text-4xl font-display text-foreground mb-2">{data.name}</h1>
+                <div className="mb-4"><FollowButton kind="person" targetId={String(data.id)} name={data.name} image={data.photo} /></div>
                 <p className="text-sm text-muted-foreground mb-4">
                   {data.knownFor}{data.birthday ? ` · Born ${data.birthday}` : ""} · {tvCount} shows · {movieCount} movies
                 </p>
