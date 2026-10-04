@@ -28,7 +28,7 @@ interface TmdbTvDetails {
   number_of_episodes: number;
   status: string;
   genres: { id: number; name: string }[];
-  networks: { name: string }[];
+  networks: { id: number; name: string }[];
   credits?: {
     cast: { id: number; name: string; character: string; profile_path: string | null }[];
   };
@@ -118,6 +118,7 @@ function mapDetailsToDrama(d: TmdbTvDetails): Drama {
     rating: Math.round(d.vote_average * 10) / 10,
     year,
     network: d.networks?.[0]?.name || "",
+    networkId: d.networks?.[0]?.id,
     similarIds,
   };
 }
@@ -232,6 +233,28 @@ export async function fetchNetflixKDramas(page = 1, sortBy = "vote_average.desc"
     with_watch_providers: "8",
     watch_region: "US",
   });
+  return {
+    dramas: (data.results || []).map(mapTvToDrama),
+    totalPages: Math.min(data.total_pages || 1, 20),
+  };
+}
+
+// Channel / network pages
+export async function fetchNetwork(id: string): Promise<{ name: string; logo: string; country: string }> {
+  const d = await callProxy("network", { id: parseInt(id) });
+  return {
+    name: d.name || "Channel",
+    logo: d.logo_path ? `${TMDB_IMG}/w300${d.logo_path}` : "",
+    country: d.origin_country || "",
+  };
+}
+
+export async function fetchNetworkShows(
+  id: string,
+  mode: "now" | "history",
+  page = 1,
+): Promise<{ dramas: Drama[]; totalPages: number }> {
+  const data = await callProxy("network_shows", { id: parseInt(id), mode, page });
   return {
     dramas: (data.results || []).map(mapTvToDrama),
     totalPages: Math.min(data.total_pages || 1, 20),

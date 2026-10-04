@@ -41,6 +41,7 @@ export interface Drama {
   rating: number;
   year: number;
   network: string;
+  networkId?: number;
   similarIds: string[];
 }
 
