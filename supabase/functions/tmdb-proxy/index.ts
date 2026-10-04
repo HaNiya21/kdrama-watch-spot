@@ -48,6 +48,11 @@ serve(async (req) => {
         url = `${TMDB_BASE}/search/tv?api_key=${TMDB_API_KEY}&query=${query}&language=en-US&include_adult=false`;
         break;
       }
+      case "search_people": {
+        const query = encodeURIComponent(params?.query || "");
+        url = `${TMDB_BASE}/search/person?api_key=${TMDB_API_KEY}&query=${query}&language=en-US&include_adult=false`;
+        break;
+      }
       case "details": {
         const id = params?.id;
         if (!id) throw new Error("Missing id parameter");
