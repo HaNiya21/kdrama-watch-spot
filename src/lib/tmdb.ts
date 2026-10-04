@@ -147,6 +147,52 @@ export async function searchKDramas(query: string): Promise<Drama[]> {
   return results.map(mapTvToDrama);
 }
 
+export interface PersonSearchResult {
+  id: number;
+  name: string;
+  photo: string;
+  knownFor: string;
+  knownForTitles: string[];
+}
+
+export async function searchPeople(query: string): Promise<PersonSearchResult[]> {
+  const data = await callProxy("search_people", { query });
+  return (data.results || []).slice(0, 8).map((p: any) => ({
+    id: p.id,
+    name: p.name,
+    photo: p.profile_path ? `${TMDB_IMG}/w185${p.profile_path}` : "",
+    knownFor: p.known_for_department || "",
+    knownForTitles: (p.known_for || []).map((k: any) => k.name || k.title).filter(Boolean).slice(0, 3),
+  }));
+}
+
+// Popular K-drama channels (TMDB network IDs) for channel search
+const KOREAN_NETWORKS: { id: number; name: string }[] = [
+  { id: 866, name: "tvN" },
+  { id: 213, name: "Netflix" },
+  { id: 2322, name: "JTBC" },
+  { id: 49, name: "KBS2" },
+  { id: 68, name: "KBS1" },
+  { id: 43, name: "SBS" },
+  { id: 97, name: "MBC" },
+  { id: 3323, name: "ENA" },
+  { id: 627, name: "OCN" },
+  { id: 2739, name: "Disney+" },
+  { id: 3186, name: "Coupang Play" },
+  { id: 3353, name: "TVING" },
+  { id: 3767, name: "wavve" },
+  { id: 2552, name: "Apple TV+" },
+  { id: 3038, name: "Channel A" },
+  { id: 3528, name: "MBN" },
+  { id: 3881, name: "Genie TV" },
+];
+
+export function searchNetworks(query: string): { id: number; name: string }[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  return KOREAN_NETWORKS.filter(n => n.name.toLowerCase().includes(q));
+}
+
 export async function fetchKDramaDetails(id: string): Promise<Drama> {
   const data = await callProxy("details", { id: parseInt(id) });
   return mapDetailsToDrama(data as TmdbTvDetails);
