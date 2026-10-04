@@ -71,7 +71,7 @@ const FollowButton = ({ kind, targetId, name, image }: Props) => {
         {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Heart className={`w-4 h-4 ${existing ? "fill-current" : ""}`} />}
         {existing ? "Following" : "Follow"}
       </button>
-      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );
 };
