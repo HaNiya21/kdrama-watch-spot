@@ -34,6 +34,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8">
             <Link to="/" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Home</Link>
             <Link to="/browse" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Browse</Link>
+            <Link to="/mood-match" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Mood Match</Link>
             <Link to="/recommendations" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors flex items-center gap-1">
               <Sparkles className="w-4 h-4" /> For You
             </Link>
@@ -130,6 +131,7 @@ const Navbar = () => {
               <div className="flex flex-col p-4 gap-3">
                 <Link to="/" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Home</Link>
                 <Link to="/browse" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Browse</Link>
+                <Link to="/mood-match" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Mood Match</Link>
                 <Link to="/community" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">Community</Link>
                 {user && <Link to="/watchlist" onClick={() => setMobileOpen(false)} className="text-sm font-medium text-foreground/70 hover:text-foreground py-2">My Watchlist</Link>}
               </div>
