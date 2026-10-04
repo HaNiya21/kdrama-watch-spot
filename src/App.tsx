@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound.tsx";
 import NetflixGuide from "./pages/NetflixGuide.tsx";
 import Person from "./pages/Person.tsx";
 import Network from "./pages/Network.tsx";
+import MoodMatch from "./pages/MoodMatch.tsx";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/drama/:id" element={<DramaDetail />} />
             <Route path="/person/:id" element={<Person />} />
             <Route path="/network/:id" element={<Network />} />
+            <Route path="/mood-match" element={<MoodMatch />} />
             <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/community" element={<Community />} />
