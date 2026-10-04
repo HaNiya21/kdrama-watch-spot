@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import FollowButton from "@/components/FollowButton";
 import DramaCard from "@/components/DramaCard";
 import { fetchNetwork, fetchNetworkShows } from "@/lib/tmdb";
 
@@ -59,6 +60,7 @@ const Network = () => {
           )}
           <div>
             <h1 className="text-4xl font-display text-foreground">{name}</h1>
+            {network && <div className="mt-2"><FollowButton kind="network" targetId={id!} name={name} image={network.logo} /></div>}
             {network?.country && <p className="text-sm text-muted-foreground">{network.country}</p>}
           </div>
         </div>

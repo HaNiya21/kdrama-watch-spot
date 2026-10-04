@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Calendar, Clock, Mail, User as UserIcon, Loader2, Pencil, Check, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import WatchlistSummary from "@/components/WatchlistSummary";
+import FollowingList from "@/components/FollowingList";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -197,6 +198,7 @@ const Profile = () => {
             <h2 className="text-2xl font-display text-foreground mb-1">Watchlist</h2>
             <p className="text-sm text-muted-foreground mb-6">Your tracking activity at a glance</p>
             <WatchlistSummary />
+            <FollowingList />
           </section>
 
           <div className="mt-6 flex flex-wrap gap-3">
