@@ -35,7 +35,7 @@ export interface Drama {
   synopsis: string;
   genres: string[];
   tags: string[];
-  cast: { name: string; role: string; image: string }[];
+  cast: { name: string; role: string; image: string; id?: number }[];
   episodes: number;
   airingStatus: "ongoing" | "completed";
   rating: number;

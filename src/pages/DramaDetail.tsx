@@ -173,17 +173,27 @@ const DramaDetail = () => {
               <>
                 <h2 className="text-xl font-display text-foreground mb-3">Cast</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                  {drama.cast.map(member => (
-                    <div key={member.name} className="bg-card rounded-lg p-3 border border-border flex items-center gap-3">
-                      {member.image && (
-                        <img src={member.image} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
-                      )}
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{member.name}</p>
-                        <p className="text-xs text-muted-foreground">as {member.role}</p>
-                      </div>
-                    </div>
-                  ))}
+                  {drama.cast.map(member => {
+                    const inner = (
+                      <>
+                        {member.image && (
+                          <img src={member.image} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+                        )}
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{member.name}</p>
+                          <p className="text-xs text-muted-foreground">as {member.role}</p>
+                        </div>
+                      </>
+                    );
+                    const cls = "bg-card rounded-lg p-3 border border-border flex items-center gap-3";
+                    return member.id ? (
+                      <Link key={member.name} to={`/person/${member.id}`} className={`${cls} hover:border-primary transition-colors`}>
+                        {inner}
+                      </Link>
+                    ) : (
+                      <div key={member.name} className={cls}>{inner}</div>
+                    );
+                  })}
                 </div>
               </>
             )}
