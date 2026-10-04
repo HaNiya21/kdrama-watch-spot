@@ -38,6 +38,17 @@ const Browse = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  // People (actor) search
+  const { data: peopleResults } = useQuery({
+    queryKey: ["tmdb-search-people", query],
+    queryFn: () => searchPeople(query),
+    enabled: query.trim().length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Channel search (client-side match on known K-drama networks)
+  const networkResults = searchNetworks(query);
+
   // Top rated mode
   const { data: topRated, isLoading: topRatedLoading } = useQuery({
     queryKey: ["tmdb-top-rated-browse"],
