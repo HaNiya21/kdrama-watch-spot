@@ -59,6 +59,12 @@ serve(async (req) => {
         url = `${TMDB_BASE}/discover/tv?api_key=${TMDB_API_KEY}&with_original_language=ko&sort_by=vote_average.desc&vote_count.gte=50&page=${page}&include_adult=false`;
         break;
       }
+      case "person": {
+        const pid = parseInt(params?.id);
+        if (!pid) throw new Error("Missing id parameter");
+        url = `${TMDB_BASE}/person/${pid}?api_key=${TMDB_API_KEY}&language=en-US&append_to_response=combined_credits`;
+        break;
+      }
       case "genres": {
         url = `${TMDB_BASE}/genre/tv/list?api_key=${TMDB_API_KEY}&language=en-US`;
         break;

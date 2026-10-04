@@ -30,7 +30,7 @@ interface TmdbTvDetails {
   genres: { id: number; name: string }[];
   networks: { name: string }[];
   credits?: {
-    cast: { name: string; character: string; profile_path: string | null }[];
+    cast: { id: number; name: string; character: string; profile_path: string | null }[];
   };
   similar?: { results: TmdbTvResult[] };
   keywords?: { results: { id: number; name: string }[] };
@@ -92,6 +92,7 @@ function mapDetailsToDrama(d: TmdbTvDetails): Drama {
   const year = d.first_air_date ? parseInt(d.first_air_date.substring(0, 4)) : 0;
   const genres = d.genres.map(g => g.name);
   const cast = (d.credits?.cast || []).slice(0, 8).map(c => ({
+    id: c.id,
     name: c.name,
     role: c.character,
     image: c.profile_path ? `${TMDB_IMG}/w185${c.profile_path}` : "",
@@ -148,6 +149,61 @@ export async function searchKDramas(query: string): Promise<Drama[]> {
 export async function fetchKDramaDetails(id: string): Promise<Drama> {
   const data = await callProxy("details", { id: parseInt(id) });
   return mapDetailsToDrama(data as TmdbTvDetails);
+}
+
+export interface PersonCredit {
+  id: number;
+  mediaType: "tv" | "movie";
+  title: string;
+  character: string;
+  poster: string;
+  year: number;
+  rating: number;
+}
+
+export interface PersonDetails {
+  id: number;
+  name: string;
+  biography: string;
+  photo: string;
+  knownFor: string;
+  birthday: string | null;
+  credits: PersonCredit[];
+}
+
+export async function fetchPerson(id: string): Promise<PersonDetails> {
+  const d = await callProxy("person", { id: parseInt(id) });
+  const seen = new Set<string>();
+  const credits: PersonCredit[] = (d.combined_credits?.cast || [])
+    .filter((c: any) => c.media_type === "tv" || c.media_type === "movie")
+    .map((c: any) => {
+      const date = c.first_air_date || c.release_date || "";
+      return {
+        id: c.id,
+        mediaType: c.media_type,
+        title: c.name || c.title,
+        character: c.character || "",
+        poster: c.poster_path ? `${TMDB_IMG}/w342${c.poster_path}` : "/placeholder.svg",
+        year: date ? parseInt(date.substring(0, 4)) : 0,
+        rating: Math.round((c.vote_average || 0) * 10) / 10,
+      };
+    })
+    .filter((c: PersonCredit) => {
+      const k = `${c.mediaType}-${c.id}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    })
+    .sort((a: PersonCredit, b: PersonCredit) => (b.year || 0) - (a.year || 0));
+  return {
+    id: d.id,
+    name: d.name,
+    biography: d.biography || "",
+    photo: d.profile_path ? `${TMDB_IMG}/w342${d.profile_path}` : "",
+    knownFor: d.known_for_department || "",
+    birthday: d.birthday || null,
+    credits,
+  };
 }
 
 export async function fetchTmdbGenres(): Promise<{ id: number; name: string }[]> {
