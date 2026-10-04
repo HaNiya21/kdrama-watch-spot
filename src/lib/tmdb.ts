@@ -28,7 +28,7 @@ interface TmdbTvDetails {
   number_of_episodes: number;
   status: string;
   genres: { id: number; name: string }[];
-  networks: { name: string }[];
+  networks: { id: number; name: string }[];
   credits?: {
     cast: { id: number; name: string; character: string; profile_path: string | null }[];
   };
@@ -118,6 +118,7 @@ function mapDetailsToDrama(d: TmdbTvDetails): Drama {
     rating: Math.round(d.vote_average * 10) / 10,
     year,
     network: d.networks?.[0]?.name || "",
+    networkId: d.networks?.[0]?.id,
     similarIds,
   };
 }

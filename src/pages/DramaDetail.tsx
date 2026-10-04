@@ -135,11 +135,15 @@ const DramaDetail = () => {
                   <Tv className="w-4 h-4" /><span className="text-sm">{drama.episodes} Episodes</span>
                 </div>
               )}
-              {drama.network && (
+              {drama.network && (drama.networkId ? (
+                <Link to={`/network/${drama.networkId}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-primary underline-offset-4 hover:underline">
+                  <PlayCircle className="w-4 h-4" /><span className="text-sm">{drama.network}</span>
+                </Link>
+              ) : (
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <PlayCircle className="w-4 h-4" /><span className="text-sm">{drama.network}</span>
                 </div>
-              )}
+              ))}
               <span className={`text-xs font-medium px-3 py-1 rounded-full ${drama.airingStatus === "ongoing" ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}`}>
                 {drama.airingStatus === "ongoing" ? "Currently Airing" : "Completed"}
               </span>

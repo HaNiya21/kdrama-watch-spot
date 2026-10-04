@@ -59,6 +59,25 @@ serve(async (req) => {
         url = `${TMDB_BASE}/discover/tv?api_key=${TMDB_API_KEY}&with_original_language=ko&sort_by=vote_average.desc&vote_count.gte=50&page=${page}&include_adult=false`;
         break;
       }
+      case "network": {
+        const nid = parseInt(params?.id);
+        if (!nid) throw new Error("Missing id parameter");
+        url = `${TMDB_BASE}/network/${nid}?api_key=${TMDB_API_KEY}`;
+        break;
+      }
+      case "network_shows": {
+        const nid = parseInt(params?.id);
+        if (!nid) throw new Error("Missing id parameter");
+        const page = parseInt(params?.page) || 1;
+        const today = new Date();
+        const iso = (d: Date) => d.toISOString().slice(0, 10);
+        const weekAgo = new Date(today.getTime() - 7 * 864e5);
+        const base = `${TMDB_BASE}/discover/tv?api_key=${TMDB_API_KEY}&with_networks=${nid}&with_original_language=ko&include_adult=false&page=${page}`;
+        url = params?.mode === "now"
+          ? `${base}&air_date.gte=${iso(weekAgo)}&air_date.lte=${iso(new Date(today.getTime() + 7 * 864e5))}&sort_by=popularity.desc`
+          : `${base}&first_air_date.lte=${iso(today)}&sort_by=first_air_date.desc`;
+        break;
+      }
       case "person": {
         const pid = parseInt(params?.id);
         if (!pid) throw new Error("Missing id parameter");
